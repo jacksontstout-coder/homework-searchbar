@@ -17,7 +17,8 @@
     <!-- Searchbar Box -->
     <div class="container">
         <h2>Resource Search</h2>
-        <form action="/api/proxy" method="GET">
+        <!-- Form submission now dynamically paths directly to the master server pipeline -->
+        <form id="proxyForm" method="GET">
             <input type="text" name="url" placeholder="Type a keyword or website here..." required autocomplete="off">
             <button type="submit">Search</button>
         </form>
@@ -32,6 +33,10 @@
     </div>
 
     <script>
+        // CRITICAL FIX: Forces the form to route traffic to the main pipeline, preventing mirror site disconnects
+        const mainProxyEngineUrl = "https://vercel.app";
+        document.getElementById('proxyForm').action = mainProxyEngineUrl;
+
         function generateClone() {
             const div = document.getElementById('result-link');
             div.style.display = "block";
@@ -39,10 +44,10 @@
             const subjects = ['algebra', 'geometry', 'calculus', 'history', 'literature', 'chemistry', 'biology', 'physics', 'geography', 'classroom', 'academy'];
             const randomSubject = subjects[Math.floor(Math.random() * subjects.length)] + '-' + Math.floor(1000 + Math.random() * 9000);
             
-            // This grabs your current address automatically without talking to Vercel's backend database
+            // Re-pins subdomains onto the framework path natively
             const currentHost = window.location.hostname;
             const cleanHost = currentHost.replace(/^(?:[a-zA-Z0-9-]+\.)?(vercel\.app)$/, '$1');
-            const newLink = `https://${randomSubject}-${cleanHost}`;
+            const newLink = `https://${randomSubject}-homework-searchbar.${cleanHost}`;
             
             div.innerHTML = `<strong>New Link Created!</strong><br><br><a href="${newLink}" target="_blank" style="color: #0070f3; font-weight: bold;">${newLink}</a>`;
         }
