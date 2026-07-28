@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educational Hub</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: #fafafa; }
+        .container { text-align: center; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); width: 90%; max-width: 500px; margin-bottom: 20px; }
+        input[type="text"] { width: 100%; padding: 14px; font-size: 16px; border: 1px solid #e0e0e0; border-radius: 6px; box-sizing: border-box; margin-bottom: 20px; outline: none; }
+        button { padding: 12px 30px; font-size: 16px; background: #0070f3; color: white; border: none; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold;}
+        .bot-btn { background: #1a1a1a; margin-top: 10px; }
+        #result-link { margin-top: 25px; padding: 15px; background: #f0f7ff; border: 1px solid #bae7ff; border-radius: 6px; display: none; word-break: break-all; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <!-- Searchbar Box -->
+    <div class="container">
+        <h2>Resource Search</h2>
+        <form action="/api/proxy" method="GET">
+            <input type="text" name="url" placeholder="Type a keyword or website here..." required autocomplete="off">
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
+    <!-- Clone Generator Bot Box -->
+    <div class="container">
+        <h2>Proxy Clone Bot</h2>
+        <p style="color: #666; font-size: 14px;">Click below to instantly generate a completely new web link that mirrors this exact searchbar.</p>
+        <button class="bot-btn" onclick="generateClone()">🤖 Generate New Educational Link</button>
+        <div id="result-link"></div>
+    </div>
+
+    <script>
+        function generateClone() {
+            const div = document.getElementById('result-link');
+            div.style.display = "block";
+            
+            const subjects = ['algebra', 'geometry', 'calculus', 'history', 'literature', 'chemistry', 'biology', 'physics', 'geography', 'classroom', 'academy'];
+            const randomSubject = subjects[Math.floor(Math.random() * subjects.length)] + '-' + Math.floor(1000 + Math.random() * 9000);
+            
+            // This grabs your current address automatically without talking to Vercel's backend database
+            const currentHost = window.location.hostname;
+            const cleanHost = currentHost.replace(/^(?:[a-zA-Z0-9-]+\.)?(vercel\.app)$/, '$1');
+            const newLink = `https://${randomSubject}-${cleanHost}`;
+            
+            div.innerHTML = `<strong>New Link Created!</strong><br><br><a href="${newLink}" target="_blank" style="color: #0070f3; font-weight: bold;">${newLink}</a>`;
+        }
+    </script>
+</body>
+</html>
