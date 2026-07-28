@@ -11,11 +11,12 @@
         button { padding: 12px 30px; font-size: 16px; background: #0070f3; color: white; border: none; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold;}
         .bot-btn { background: #1a1a1a; margin-top: 10px; }
         #result-link { margin-top: 25px; padding: 15px; background: #f0f7ff; border: 1px solid #bae7ff; border-radius: 6px; display: none; word-break: break-all; font-size: 16px; }
+        #assignment-banner { display: none; margin-bottom: 10px; color: #666; font-size: 14px; font-weight: bold; background: #e6ffed; padding: 8px 20px; border-radius: 20px; border: 1px solid #b7eb8f; }
     </style>
 </head>
 <body>
-    <!-- Disguised Header Indicator -->
-    <div id="assignment-banner" style="display: none; margin-bottom: 10px; color: #666; font-size: 14px; font-weight: bold; background: #e6ffed; padding: 8px 20px; border-radius: 20px; border: 1px solid #b7eb8f;"></div>
+    <!-- Hidden Disguise Banner -->
+    <div id="assignment-banner"></div>
 
     <!-- Searchbar Box -->
     <div class="container">
@@ -29,8 +30,8 @@
     <!-- Clone Generator Bot Box -->
     <div class="container">
         <h2>Proxy Clone Bot</h2>
-        <p style="color: #666; font-size: 14px;">Click below to instantly generate a completely new web link that mirrors this exact searchbar data.</p>
-        <button class="bot-btn" onclick="generateClone()">🤖 Generate New Educational Sigma</button>
+        <p style="color: #666; font-size: 14px;">Click below to instantly generate a completely new web link that mirrors this exact searchbar.</p>
+        <button class="bot-btn" onclick="generateClone()">🤖 Generate New Educational Rizzler</button>
         <div id="result-link"></div>
     </div>
 
@@ -41,8 +42,9 @@
         
         if (activeAssignment) {
             // Transform interface text elements dynamically to match the disguise path seamlessly
-            document.getElementById('assignment-banner').style.display = "block";
-            document.getElementById('assignment-banner').innerText = `📚 Active Session: ${activeAssignment.toUpperCase()}`;
+            const banner = document.getElementById('assignment-banner');
+            banner.style.display = "block";
+            banner.innerText = `📚 Active Session: ${activeAssignment.toUpperCase()}`;
             document.getElementById('search-title').innerText = "Workspace Database Search";
         }
 
@@ -54,8 +56,9 @@
             const subjects = ['algebra-workbook', 'geometry-proofs', 'calculus-limits', 'history-archive', 'literature-notes', 'chemistry-lab', 'biology-cells', 'physics-vectors'];
             const randomSubject = subjects[Math.floor(Math.random() * subjects.length)] + '-' + Math.floor(1000 + Math.random() * 9000);
             
-            // Constructs a fully real, live mirror query address safely running on your server
-            const newLink = `https://vercel.app{randomSubject}`;
+            // FIX: Uses parameters instead of broken subdomains so the internet path never errors out
+            const currentUrl = window.location.origin + window.location.pathname;
+            const newLink = `${currentUrl}?assignment=${randomSubject}`;
             
             div.innerHTML = `<strong>New Link Created!</strong><br><br><a href="${newLink}" target="_blank" style="color: #0070f3; font-weight: bold;">${newLink}</a>`;
         }
