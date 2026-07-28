@@ -1,67 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Educational Hub</title>
-    <style>
-        body { font-family: sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: #fafafa; }
-        .container { text-align: center; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); width: 90%; max-width: 500px; margin-bottom: 20px; }
-        input[type="text"] { width: 100%; padding: 14px; font-size: 16px; border: 1px solid #e0e0e0; border-radius: 6px; box-sizing: border-box; margin-bottom: 20px; outline: none; }
-        button { padding: 12px 30px; font-size: 16px; background: #0070f3; color: white; border: none; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold;}
-        .bot-btn { background: #1a1a1a; margin-top: 10px; }
-        #result-link { margin-top: 25px; padding: 15px; background: #f0f7ff; border: 1px solid #bae7ff; border-radius: 6px; display: none; word-break: break-all; font-size: 16px; }
-        #assignment-banner { display: none; margin-bottom: 10px; color: #666; font-size: 14px; font-weight: bold; background: #e6ffed; padding: 8px 20px; border-radius: 20px; border: 1px solid #b7eb8f; }
-    </style>
-</head>
-<body>
-    <!-- Hidden Disguise Banner -->
-    <div id="assignment-banner"></div>
+export default async function handler(req, res) {
+    let target = req.query.url;
+    if (!target) return res.status(400).send('Search item missing');
 
-    <!-- Searchbar Box -->
-    <div class="container">
-        <h2 id="search-title">Resource Search</h2>
-        <form action="/api/proxy" method="GET">
-            <input type="text" name="url" placeholder="Type a keyword or website here..." required autocomplete="off">
-            <button type="submit">Search</button>
-        </form>
-    </div>
+    // Smart pipeline: If it's just words, route it through an encrypted search engine layout
+    if (!target.includes('.')) {
+        target = 'https://duckduckgo.com' + encodeURIComponent(target);
+    } else if (!/^https?:\/\//i.test(target)) {
+        target = 'https://' + target;
+    }
 
-    <!-- Clone Generator Bot Box -->
-    <div class="container">
-        <h2>Proxy Clone Bot</h2>
-        <p style="color: #666; font-size: 14px;">Click below to instantly generate a completely new web link that mirrors this exact searchbar.</p>
-        <button class="bot-btn" onclick="generateClone()">🤖 Generate New Educational Rizzler</button>
-        <div id="result-link"></div>
-    </div>
+    try {
+        const response = await fetch(target, {
+            method: 'GET',
+            headers: { 
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.5'
+            }
+        });
 
-    <script>
-        // Check if the user loaded a generated clone path link
-        const urlParams = new URLSearchParams(window.location.search);
-        const activeAssignment = urlParams.get('assignment');
-        
-        if (activeAssignment) {
-            // Transform interface text elements dynamically to match the disguise path seamlessly
-            const banner = document.getElementById('assignment-banner');
-            banner.style.display = "block";
-            banner.innerText = `📚 Active Session: ${activeAssignment.toUpperCase()}`;
-            document.getElementById('search-title').innerText = "Workspace Database Search";
+        if (!response.ok) {
+            return res.status(response.status).send(`Website blocked the proxy connection. Error Code: ${response.status}`);
         }
 
-        function generateClone() {
-            const div = document.getElementById('result-link');
-            div.style.display = "block";
-            
-            // Random educational tags
-            const subjects = ['algebra-workbook', 'geometry-proofs', 'calculus-limits', 'history-archive', 'literature-notes', 'chemistry-lab', 'biology-cells', 'physics-vectors'];
-            const randomSubject = subjects[Math.floor(Math.random() * subjects.length)] + '-' + Math.floor(1000 + Math.random() * 9000);
-            
-            // FIX: Uses parameters instead of broken subdomains so the internet path never errors out
-            const currentUrl = window.location.origin + window.location.pathname;
-            const newLink = `${currentUrl}?assignment=${randomSubject}`;
-            
-            div.innerHTML = `<strong>New Link Created!</strong><br><br><a href="${newLink}" target="_blank" style="color: #0070f3; font-weight: bold;">${newLink}</a>`;
-        }
-    </script>
-</body>
-</html>
+        let html = await response.text();
+
+        // Security Patch: Injects code so links clicked inside the proxied site don't escape your proxy window
+        const baseDomain = new URL(target).origin;
+        html = html.replace(/href="\/([^"]*)"/g, `href="/api/proxy?url=${encodeURIComponent(baseDomain)}/$1"`);
+        html = html.replace(/href="http([^"]*)"/g, (match, p1) => `href="/api/proxy?url=${encodeURIComponent('http' + p1)}"`);
+
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        return res.status(200).send(html);
+    } catch (err) {
+        return res.status(500).send(`Network Connection Fault: ${err.message}`);
+    }
+}
